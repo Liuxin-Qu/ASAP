@@ -563,6 +563,11 @@ class PPO(BaseAlgo):
     ##########################################################################################
 
     def env_step(self, actor_state):
+        # if hasattr(self.env, "commands"):
+        #     self.env.commands[:,0] = 0.8
+        #     logger.info(f"******************************************************************************Set env.commands[0] to {self.env.commands}")
+        # else:
+        #     logger.warning("************************************************************************************env.commands does not exist!")
         obs_dict, rewards, dones, extras = self.env.step(actor_state)
         actor_state.update(
             {"obs": obs_dict, "rewards": rewards, "dones": dones, "extras": extras}

@@ -174,13 +174,14 @@ Train a phase-based motion tracking policy to imitate Cristiano Ronaldo's signat
 ```bash
 python humanoidverse/train_agent.py \
 +simulator=isaacgym \
++device=cuda:0 \
 +exp=motion_tracking \
 +domain_rand=NO_domain_rand \
 +rewards=motion_tracking/reward_motion_tracking_dm_2real \
 +robot=g1/g1_29dof_anneal_23dof \
 +terrain=terrain_locomotion_plane \
 +obs=motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history \
-num_envs=4096 \
+num_envs=8192 \
 project_name=MotionTracking \
 experiment_name=MotionTracking_CR7 \
 robot.motion.motion_file="humanoidverse/data/motions/g1_29dof_anneal_23dof/TairanTestbed/singles/0-TairanTestbed_TairanTestbed_CR7_video_CR7_level1_filter_amass.pkl" \
@@ -198,6 +199,8 @@ After training, you can visualize the policy by:
 ```bash
 python humanoidverse/eval_agent.py \
 +checkpoint=logs/MotionTracking/xxxxxxxx_xxxxxxx-MotionTracking_CR7-motion_tracking-g1_29dof_anneal_23dof/model_5800.pt
+
+python humanoidverse/eval_agent.py +checkpoint=logs/TestIsaacGymInstallation/20250401_003402-G123dof_loco-locomotion-g1_29dof_anneal_23dof/model_7900.pt
 ```
 
 This is the visualization of the policy after traning 5800 iters. The policy is able to imitate the motion of Cristiano Ronaldo's Siuuu move. With more training, the policy will be more accurate and smooth (see the video in the [paper](https://arxiv.org/pdf/2502.01143)).

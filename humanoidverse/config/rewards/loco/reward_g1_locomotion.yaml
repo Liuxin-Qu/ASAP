@@ -12,7 +12,7 @@ rewards:
       tracking_ang_vel: 0.5
       penalty_lin_vel_z: -2.0
       penalty_ang_vel_xy: -1.0
-      penalty_orientation: -1.0
+      penalty_orientation: -2.0
       penalty_torques: -0.00001
       # penalty_dof_vel: -0.0001
       penalty_dof_acc: -3.5e-8

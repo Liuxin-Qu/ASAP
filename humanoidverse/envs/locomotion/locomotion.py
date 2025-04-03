@@ -132,6 +132,7 @@ class LeggedRobotLocomotion(LeggedRobotBase):
     def set_is_evaluating(self, command=None):
         super().set_is_evaluating()
         self.commands = torch.zeros((self.num_envs, 4), dtype=torch.float32, device=self.device)
+        self.commands[:, :] =  torch.tensor(self.config.eval_commands, device=self.device, dtype=torch.float32).repeat(self.num_envs, 1)
         # TODO: haotian: adding command configuration
         if command is not None:
             self.commands[:, :3] = torch.tensor(command).to(self.device)  # only set the first 3 commands
