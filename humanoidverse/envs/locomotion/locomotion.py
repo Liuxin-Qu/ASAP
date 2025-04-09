@@ -28,7 +28,29 @@ class LeggedRobotLocomotion(LeggedRobotBase):
         self.upper_left_arm_dof_indices = [self.dof_names.index(dof) for dof in self.upper_left_arm_dof_names]
         self.upper_right_arm_dof_indices = [self.dof_names.index(dof) for dof in self.upper_right_arm_dof_names]
         self.hips_dof_id = [self.simulator._body_list.index(link) - 1 for link in self.config.robot.motion.hips_link] # Yuanhang: -1 for the base link (pelvis)
+        self.stance_mask = torch.zeros((self.num_envs, 2), device=self.device)
+        
+        
         self.init_done = True
+    
+    def  _get_phase(self):
+        phase = self.episode_length_buf * self.dt / self.config.rewards.cycle_time
+        return phase
+    
+    def _get_gait_phase(self):
+        # return float mask 1 is stance, 0 is swing
+        phase = self._get_phase()
+        sin_pos = torch.sin(2 * torch.pi * phase)
+        # Add double support phase
+        stance_mask = torch.zeros((self.num_envs, 2), device=self.device)
+        # left foot stance
+        stance_mask[:, 0] = sin_pos >= 0
+        # right foot stance
+        stance_mask[:, 1] = sin_pos < 0
+        # no support phase
+        stance_mask[torch.abs(sin_pos) < self.config.rewards.air_phase_threshold] = 0 #将原本的双足支撑期 改为 腾空期
+
+        return stance_mask
     
     def _init_buffers(self):
         super()._init_buffers()
@@ -175,7 +197,7 @@ class LeggedRobotLocomotion(LeggedRobotBase):
     def _reward_feet_air_time(self):
         # Reward long steps
         # Need to filter the contacts because the contact reporting of PhysX is unreliable on meshes
-        contact = self.simulator.contact_forces[:, self.feet_indices, 2] > 1.
+        contact = self.simulator.contact_forces[:, self.feet_indices, 2] > 5.
         contact_filt = torch.logical_or(contact, self.last_contacts) 
         self.last_contacts = contact
         first_contact = (self.feet_air_time > 0.) * contact_filt
@@ -185,8 +207,18 @@ class LeggedRobotLocomotion(LeggedRobotBase):
         self.feet_air_time *= ~contact_filt
         return rew_airTime
     
+    def _reward_feet_contact_number(self):
+        """
+        Calculates a reward based on the number of feet contacts aligning with the gait phase. 
+        Rewards or penalizes depending on whether the foot contact matches the expected gait phase.
+        """
+        contact = self.simulator.contact_forces[:, self.feet_indices, 2] > 5.
+        stance_mask = self._get_gait_phase()
+        reward = torch.where(contact == stance_mask, 1.0, -0.3)
+        return torch.mean(reward, dim=1)
+    
     def _reward_penalty_in_the_air(self):
-        contact = self.simulator.contact_forces[:, self.feet_indices, 2] > 1.
+        contact = self.simulator.contact_forces[:, self.feet_indices, 2] > 5.
         contact_filt = torch.logical_or(contact, self.last_contacts) 
         first_foot_contact = contact_filt[:,0]
         second_foot_contact = contact_filt[:,1]

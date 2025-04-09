@@ -7,6 +7,8 @@ rewards:
   set_reward: Yuanhang
   set_reward_date: 20250206
   only_positive_rewards: False
+  cycle_time: 0.4
+  air_phase_threshold: 0.45  #0.45腾空趋势明显
   reward_scales:
       tracking_lin_vel: 1.0
       tracking_ang_vel: 0.5
@@ -25,7 +27,8 @@ rewards:
       # limits_dof_vel: -5.0
       # limits_torque: -0.1
       feet_air_time: 1.0
-      base_height: -10.0
+      feet_contact_number: 1.5
+      base_height: -5.0
       penalty_feet_height: -2.5
       # termination: -500.0
       # penalty_in_the_air: -100.0

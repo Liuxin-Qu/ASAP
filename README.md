@@ -200,7 +200,7 @@ After training, you can visualize the policy by:
 python humanoidverse/eval_agent.py \
 +checkpoint=logs/MotionTracking/xxxxxxxx_xxxxxxx-MotionTracking_CR7-motion_tracking-g1_29dof_anneal_23dof/model_5800.pt
 
-python humanoidverse/eval_agent.py +checkpoint=logs/TestIsaacGymInstallation/20250401_003402-G123dof_loco-locomotion-g1_29dof_anneal_23dof/model_7900.pt
+python humanoidverse/eval_agent.py +checkpoint=logs/TestIsaacGymInstallation/20250404_103545-G123dof_loco-locomotion-g1_29dof_anneal_23dof/model_30000.pt
 ```
 
 This is the visualization of the policy after traning 5800 iters. The policy is able to imitate the motion of Cristiano Ronaldo's Siuuu move. With more training, the policy will be more accurate and smooth (see the video in the [paper](https://arxiv.org/pdf/2502.01143)).
